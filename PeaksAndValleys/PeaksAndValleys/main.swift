@@ -17,15 +17,23 @@ let keyboardInput = readLine()
 
 if let input = keyboardInput {
     
-    let A = input.components(separatedBy: ", ")
+    let array = input.components(separatedBy: ", ")
+    let A = array.map({Int($0)!})
     dump(A)
     
     // result is 1 because we build on the start value of array
     var result = 1
+    var prevIndex = 0
+    
     for i in 1...A.count - 2 {
-        if ((A[i - 1] < A[i] && A[i + 1] < A[i]) ||
-            (A[i - 1]) > A[i] && A[i + 1] > A[i]) {
-            result += 1
+        if (A[i] == A[i + 1]) {
+            continue
+        } else {
+            if ((A[prevIndex] < A[i] && A[i + 1] < A[i]) ||
+                (A[prevIndex] > A[i] && A[i + 1] > A[i])) {
+                result += 1
+            }
+            prevIndex = i - 1
         }
     }
     result += 1
