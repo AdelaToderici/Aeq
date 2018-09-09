@@ -62,8 +62,8 @@ extension TransformersViewController {
         }
         
         // sort transformers teams per rank
-        let autobotArray = autobots.sorted(by: { $0.rank < $1.rank })
-        let decepticonsArray = decepticons.sorted(by: { $0.rank < $1.rank })
+        let autobotArray = autobots.sorted(by: { $0.rank > $1.rank })
+        let decepticonsArray = decepticons.sorted(by: { $0.rank > $1.rank })
         
         var autobotResult = 0
         var decepticonResult = 0
@@ -89,25 +89,25 @@ extension TransformersViewController {
             // Optimus Prime || Predaking -> automatically wins
             if (autobot.name == "Optimus Prime" || autobot.name == "Predaking") {
                 autobotResult += 1
-                decepticons.remove(at: j)
+                removeDecepticon(decepticon)
                 continue
             }
             
             if (decepticon.name == "Optimus Prime" || decepticon.name == "Predaking") {
                 decepticonResult += 1
-                autobots.remove(at: i)
+                removeAutobot(autobot)
                 continue
             }
             
             // >= 4 courage && >= 3 strength -> fighter wins
             if (autobot.courage - decepticon.courage >= 4 && autobot.strength - decepticon.strength >= 3) {
                 autobotResult += 1
-                decepticons.remove(at: j)
+                removeDecepticon(decepticon)
                 continue
             }
             if (decepticon.courage - autobot.courage >= 4 && decepticon.strength - autobot.strength >= 3) {
                 decepticonResult += 1
-                autobots.remove(at: i)
+                removeAutobot(autobot)
                 continue
             }
             
@@ -115,10 +115,10 @@ extension TransformersViewController {
             if (abs(autobot.skill - decepticon.skill) >= 3) {
                 if (autobot.skill > decepticon.skill) {
                     autobotResult += 1
-                    decepticons.remove(at: j)
+                    removeDecepticon(decepticon)
                 } else {
                     decepticonResult += 1
-                    autobots.remove(at: i)
+                    removeAutobot(autobot)
                 }
                 continue
             }
@@ -126,16 +126,16 @@ extension TransformersViewController {
             // higher overall rating: strength + intelligence + speed + endurance + firepower -> wins
             if (overallRating(autobot) > overallRating(decepticon)) {
                 autobotResult += 1
-                decepticons.remove(at: j)
+                removeDecepticon(decepticon)
             }
             else if (overallRating(decepticon) > overallRating(autobot)) {
                 decepticonResult += 1
-                autobots.remove(at: i)
+                removeAutobot(autobot)
             }
             // tie overall rating
             else {
-                autobots.remove(at: i)
-                decepticons.remove(at: j)
+                removeAutobot(autobot)
+                removeDecepticon(decepticon)
             }
         }
         
@@ -152,6 +152,18 @@ extension TransformersViewController {
         
         autobotsTableView.reloadData()
         decepticonsTableView.reloadData()
+    }
+    
+    func removeAutobot( _ autobot: Transformer) {
+        if let index = autobots.index(where: { $0.name == autobot.name && $0.strength == autobot.strength }) {
+            autobots.remove(at: index)
+        }
+    }
+    
+    func removeDecepticon( _ decepticon: Transformer) {
+        if let index = decepticons.index(where: { $0.name == decepticon.name && $0.strength == decepticon.strength }) {
+            decepticons.remove(at: index)
+        }
     }
     
     func overallRating(_ transformer: Transformer) -> Int {
@@ -271,9 +283,11 @@ extension TransformersViewController: TransformerDelegate {
         switch transformer.type {
         case .Autobot:
             autobots.append(transformer)
+            autobots = autobots.sorted(by: { $0.rank > $1.rank })
             autobotsTableView.reloadData()
         case .Decepticon:
             decepticons.append(transformer)
+            decepticons = decepticons.sorted(by: { $0.rank > $1.rank })
             decepticonsTableView.reloadData()
         }
     }
